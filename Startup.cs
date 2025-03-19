@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Reflection;
 
 namespace WebApplicationTest
 {
@@ -43,6 +44,18 @@ namespace WebApplicationTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(swagOps =>
+            {
+                swagOps.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Gmail API",
+                    Description = "Gmail API"
+                });
+                //swagOps.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSession();
@@ -102,6 +115,13 @@ namespace WebApplicationTest
             app.UseAuthentication();
             app.UseAuthorization();
             //app.UseCors("CorsPolicy");
+
+            if (env.IsDevelopment())
+            {
+                app.UseSwagger().UseSwaggerUI();
+                
+            }
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
